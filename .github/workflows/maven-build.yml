@@ -37,10 +37,8 @@ jobs:
         run: |
           set -euo pipefail
           JAR_PATH="$(ls -1 target/*.jar | grep -v 'original-' | head -n 1)"
-          if [[ -z "${NEXUS_USERNAME}" || -z "${NEXUS_PASSWORD}" ]]; then
-            echo "Missing Nexus credentials. Set secrets NEXUS_USERNAME and NEXUS_PASSWORD." >&2
-            exit 1
-          fi
+          : "${NEXUS_USERNAME:?Missing secret NEXUS_USERNAME}"
+          : "${NEXUS_PASSWORD:?Missing secret NEXUS_PASSWORD}"
           DEST_URL="${NEXUS_BASE_URL}/repository/${NEXUS_REPOSITORY}/spring-petclinic/${GITHUB_SHA}/$(basename "$JAR_PATH")"
           echo "Uploading $(basename "$JAR_PATH") to ${DEST_URL}"
           curl -f -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" --upload-file "$JAR_PATH" "$DEST_URL"
